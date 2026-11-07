@@ -32,6 +32,22 @@
       o.observe(document.body, { attributes: true, attributeFilter: ["class"] });
     })();
   </script>
+  <script>
+    (function () {
+      function scrollTop() {
+        var titre = document.getElementById("titre-exercice");
+        if (!titre) return;
+        new MutationObserver(function () {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }).observe(titre, { childList: true, subtree: true, characterData: true });
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", scrollTop);
+      } else {
+        scrollTop();
+      }
+    })();
+  </script>
 </head>
 <body>
   <header class="entete">
