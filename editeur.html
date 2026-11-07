@@ -405,6 +405,28 @@
 
         // Actions: ajouter après / supprimer
         const actionsRow = el('div', { style: 'display:flex;gap:8px;margin-top:14px;' });
+        const btnPreviewExo = el("button", { textContent: "👁 Aperçu", style: "background:#1d4ed8" });
+        btnPreviewExo.onclick = function () {
+          cmInstances.forEach(function (cm) { if (cm.save) cm.save(); });
+          var exData = gatherSingle(div);
+          var serieObj = {
+            id: document.getElementById("serieId").value.trim(),
+            titre: document.getElementById("serieTitre").value.trim(),
+            exercices: [exData]
+          };
+          document.querySelectorAll(".preview-frame").forEach(function (el) { el.remove(); });
+          var pf = document.createElement("div");
+          pf.className = "preview-frame";
+          pf.style.cssText = "margin-top:10px;width:100%;";
+          var iframe = document.createElement("iframe");
+          iframe.style.cssText = "width:100%;height:500px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;";
+          pf.appendChild(iframe);
+          div.appendChild(pf);
+          iframe.src = "./exos-1IN/index.html?preview=1";
+          iframe.onload = function () {
+            iframe.contentWindow.postMessage({ type: "scorm-preview-json", serie: serieObj }, "*");
+          };
+        };
         const btnAddAfter = el("button", { textContent: "➕ Insérer un exercice après", style: "background:#0f766e" });
         btnAddAfter.onclick = function () {
           const newEx = {
@@ -424,6 +446,7 @@
         };
         const btnDelEx = el("button", { textContent: "🗑 Supprimer cet exercice", style: "background:#7f1d1d" });
         btnDelEx.onclick = function () { if (confirm("Supprimer cet exercice ?")) div.remove(); };
+        actionsRow.appendChild(btnPreviewExo);
         actionsRow.appendChild(btnAddAfter);
         actionsRow.appendChild(btnDelEx);
         div.appendChild(actionsRow);
@@ -431,7 +454,54 @@
         return div;
       }
 
+      function gatherSingle(div) {
+        const ex = {};
+        div.querySelectorAll("[data-field]").forEach(function (inp) {
+          const k = inp.dataset.field;
+          if (k === "note" || k === "figure") {
+            ex[k] = inp.checked;
+          } else if (k === "solutions") {
+            const raw = inp.value.trim();
+            ex[k] = raw ? raw.split(/\n?---SOLUTION---\n?/) : [];
+          } else if (k === "code") {
+            ex[k] = inp.value;
+          } else {
+            ex[k] = inp.value;
+          }
+        });
+        // CodeMirror instances
+        const textareas = div.querySelectorAll('textarea');
+        textareas.forEach(function (ta) {
+          if (ta.CodeMirror) {
+            const val = ta.CodeMirror.getValue();
+            if (ta.dataset.field === 'code') ex.code = val;
+            if (ta.dataset.field === 'solutions') {
+              const raw = val.trim();
+              ex.solutions = raw ? raw.split(/\n?---SOLUTION---\n?/) : [];
+            }
+            if (ta.dataset.field === 'enonce') ex.enonce = val;
+          }
+        });
+        // checks
+        const checks = [];
+        div.querySelectorAll(".check-item").forEach(function (cbox) {
+          const ck = {};
+          cbox.querySelectorAll("[data-field]").forEach(function (inp) {
+            ck[inp.dataset.field] = inp.value;
+          });
+          const opts = {};
+          cbox.querySelectorAll("[data-opt]").forEach(function (cb) {
+            opts[cb.dataset.opt] = cb.checked;
+          });
+          ck.opts = opts;
+          checks.push(ck);
+        });
+        ex.checks = checks;
+        return ex;
+      }
+
       function gatherData() {
+        cmInstances.forEach(function (cm) { if (cm.save) cm.save(); });
         const out = {
           id: document.getElementById("serieId").value.trim(),
           titre: document.getElementById("serieTitre").value.trim(),
@@ -439,49 +509,7 @@
         };
         const container = document.getElementById("exercices");
         Array.from(container.children).forEach(function (div) {
-          const ex = {};
-          div.querySelectorAll("[data-field]").forEach(function (inp) {
-            const k = inp.dataset.field;
-            if (k === "note" || k === "figure") {
-              ex[k] = inp.checked;
-            } else if (k === "solutions") {
-              const raw = inp.value.trim();
-              ex[k] = raw ? raw.split(/\n?---SOLUTION---\n?/) : [];
-            } else if (k === "code") {
-              ex[k] = inp.value;
-            } else {
-              ex[k] = inp.value;
-            }
-          });
-          // CodeMirror instances
-          const textareas = div.querySelectorAll('textarea');
-          textareas.forEach(function (ta) {
-            if (ta.CodeMirror) {
-              const val = ta.CodeMirror.getValue();
-              if (ta.dataset.field === 'code') ex.code = val;
-              if (ta.dataset.field === 'solutions') {
-                const raw = val.trim();
-                ex.solutions = raw ? raw.split(/\n?---SOLUTION---\n?/) : [];
-              }
-              if (ta.dataset.field === 'enonce') ex.enonce = val;
-            }
-          });
-          // checks
-          const checks = [];
-          div.querySelectorAll(".check-item").forEach(function (cbox) {
-            const ck = {};
-            cbox.querySelectorAll("[data-field]").forEach(function (inp) {
-              ck[inp.dataset.field] = inp.value;
-            });
-            const opts = {};
-            cbox.querySelectorAll("[data-opt]").forEach(function (cb) {
-              opts[cb.dataset.opt] = cb.checked;
-            });
-            ck.opts = opts;
-            checks.push(ck);
-          });
-          ex.checks = checks;
-          out.exercices.push(ex);
+          out.exercices.push(gatherSingle(div));
         });
         return out;
       }

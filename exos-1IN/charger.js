@@ -10,9 +10,10 @@
   var COMMUN = (window.COMMUN || "").replace(/\/?$/, "/");
   var params = new URLSearchParams(location.search);
   var dataFile = params.get("data");
+  var isPreview = params.get("preview") === "1";
 
   /* ---------- Mode test local : menu si aucune série demandée ---------- */
-  if (!dataFile) {
+  if (!dataFile && !isPreview) {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", showMenu);
     } else {
@@ -206,9 +207,32 @@
   /* ---------- Séquence de démarrage ---------- */
   function run() {
     applyOutputExtension();
-    loadData(DATA_SCRIPT, function () {
+    function afterData() {
       loadScript(base + APP, function () {}, function () { fail(base + APP); });
-    });
+    }
+    if (isPreview) {
+      window.addEventListener("message", function handler(e) {
+        if (!e.data || !e.data.type || e.data.type.indexOf("scorm-preview") !== 0) return;
+        window.removeEventListener("message", handler);
+        try {
+          if (e.data.type === "scorm-preview-json") {
+            window.SERIE = markdownizeSerie(e.data.serie);
+            setupSansTortue(window.SERIE);
+            afterData();
+          } else if (e.data.type === "scorm-preview") {
+            eval(e.data.raw);
+            var parsed = jsyaml.load(window.SERIE_RAW);
+            window.SERIE = markdownizeSerie(parsed);
+            setupSansTortue(window.SERIE);
+            afterData();
+          }
+        } catch (err) {
+          fail("Aperçu invalide : " + err.message);
+        }
+      });
+      return;
+    }
+    loadData(DATA_SCRIPT, afterData);
   }
 
   // Styles
