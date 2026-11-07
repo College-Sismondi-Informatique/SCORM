@@ -27,11 +27,23 @@
     menu.id = "menu-local";
     menu.style.cssText = "padding:40px;font-family:sans-serif;max-width:600px;margin:auto;";
     menu.innerHTML =
-      "<h1>Série 02 — Test local</h1>" +
+      "<h1>Accueil – Cours Python 1ère</h1>" +
       "<p>Choisissez une série à ouvrir :</p>" +
       "<ul>" +
-      "<li><a href=\"?data=serie02a\">Série 02a – Les boucles for (turtle)</a></li>" +
-      "<li><a href=\"?data=serie02b\">Série 02b – Boucles for et print (console)</a></li>" +
+      "<li><a href=\"?data=serie01a\">1a – Premier programme (turtle)</a></li>" +
+      "<li><a href=\"?data=serie01b\">1b – Compléments print</a></li>" +
+      "<li><a href=\"?data=serie01c\">1c – Compléments turtle et images</a></li>" +
+      "<li><a href=\"?data=serie02a\">2a – Boucles for (turtle)</a></li>" +
+      "<li><a href=\"?data=serie02b\">2b – Boucles for et print</a></li>" +
+      "<li><a href=\"?data=serie03\">3 – Fonctions simples (turtle)</a></li>" +
+      "<li><a href=\"?data=serie04\">4 – Fonctions avec paramètres</a></li>" +
+      "<li><a href=\"?data=serie05a\">5a – Variables</a></li>" +
+      "<li><a href=\"?data=serie05b\">5b – Types et entrée-sortie</a></li>" +
+      "<li><a href=\"?data=serie06\">6 – Les conditions</a></li>" +
+      "<li><a href=\"?data=serie07\">7 – Boucle while</a></li>" +
+      "<li><a href=\"?data=serie07p1\">7.1 – Boucle while (partie 1)</a></li>" +
+      "<li><a href=\"?data=serie07p2\">7.2 – Boucle while (partie 2)</a></li>" +
+      "<li><a href=\"?data=serie08\">8 – Fonctions avec return</a></li>" +
       "</ul>" +
       "<p style=\"color:#666;font-size:0.9em;margin-top:24px;\">" +
       "En production ces liens sont invisibles ; Moodle charge automatiquement le bon paramètre.</p>";
@@ -39,10 +51,8 @@
     document.body.appendChild(menu);
   }
 
-  var _scripts = document.getElementsByTagName('script');
-  var _thisScript = document.currentScript || _scripts[_scripts.length - 1];
-  var _scriptDir = _thisScript.src.substring(0, _thisScript.src.lastIndexOf('/') + 1);
-  var DATA_SCRIPT = _scriptDir + "data/" + dataFile + ".js";
+  var DATA_BASE = "https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/";
+  var DATA_SCRIPT = DATA_BASE + dataFile + ".js";
 
   /* ---------- Dépendances ---------- */
   var STYLES = ["vendor/codemirror/codemirror.css", "css/style.css"];

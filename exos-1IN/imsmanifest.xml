@@ -66,72 +66,58 @@
     <resource identifier="res_serie01a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01a">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie01a.js"/>
     </resource>
     <resource identifier="res_serie01b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01b">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie01b.js"/>
     </resource>
     <resource identifier="res_serie01c" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01c">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie01c.js"/>
     </resource>
     <resource identifier="res_serie02a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie02a">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie02a.js"/>
     </resource>
     <resource identifier="res_serie02b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie02b">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie02b.js"/>
     </resource>
     <resource identifier="res_serie03" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie03">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie03.js"/>
     </resource>
     <resource identifier="res_serie04" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie04">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie04.js"/>
     </resource>
     <resource identifier="res_serie05a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie05a">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie05a.js"/>
     </resource>
     <resource identifier="res_serie05b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie05b">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie05b.js"/>
     </resource>
     <resource identifier="res_serie06" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie06">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie06.js"/>
     </resource>
     <resource identifier="res_serie07" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie07.js"/>
     </resource>
     <resource identifier="res_serie07p1" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07p1">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie07p1.js"/>
     </resource>
     <resource identifier="res_serie07p2" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07p2">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie07p2.js"/>
     </resource>
     <resource identifier="res_serie08" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie08">
       <file href="index.html"/>
       <file href="charger.js"/>
-      <file href="data/serie08.js"/>
     </resource>
   </resources>
 </manifest>
