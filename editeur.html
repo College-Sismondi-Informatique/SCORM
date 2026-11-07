@@ -502,10 +502,32 @@
       }
 
       function loadSerie(id) {
-        fetch("data/" + id + ".js")
+        var path = "exos-1IN/data/" + id + ".js";
+
+        function processSerieRaw() {
+          var yamlText = window.SERIE_RAW;
+          serie = jsyaml.load(yamlText);
+          if (!serie || !serie.exercices) {
+            alert("YAML invalide ou vide");
+            return;
+          }
+          document.getElementById("serieId").value = serie.id || "";
+          document.getElementById("serieTitre").value = serie.titre || "";
+          document.getElementById("serieMeta").style.display = "block";
+          var container = document.getElementById("exercices");
+          container.innerHTML = "";
+          cmInstances = [];
+          serie.exercices.forEach(function (ex, i) {
+            container.appendChild(renderExercice(ex, i));
+          });
+          document.getElementById("globalActions").style.display = "flex";
+          refreshAllCm();
+        }
+
+        fetch(path)
           .then(function (r) { return r.text(); })
           .then(function (text) {
-            const old = window.SERIE_RAW;
+            var old = window.SERIE_RAW;
             try {
               eval(text);
             } catch (e) {
@@ -513,27 +535,26 @@
               window.SERIE_RAW = old;
               return;
             }
-            const yamlText = window.SERIE_RAW;
+            processSerieRaw();
             window.SERIE_RAW = old;
-            serie = jsyaml.load(yamlText);
-            if (!serie || !serie.exercices) {
-              alert("YAML invalide ou vide");
-              return;
-            }
-            document.getElementById("serieId").value = serie.id || "";
-            document.getElementById("serieTitre").value = serie.titre || "";
-            document.getElementById("serieMeta").style.display = "block";
-            const container = document.getElementById("exercices");
-            container.innerHTML = "";
-            cmInstances = [];
-            serie.exercices.forEach(function (ex, i) {
-              container.appendChild(renderExercice(ex, i));
-            });
-            document.getElementById("globalActions").style.display = "flex";
-            refreshAllCm();
           })
           .catch(function (e) {
-            alert("Impossible de charger la série : " + e.message);
+            if (window.location.protocol === "file:") {
+              var old = window.SERIE_RAW;
+              var s = document.createElement("script");
+              s.src = path;
+              s.onload = function () {
+                processSerieRaw();
+                window.SERIE_RAW = old;
+              };
+              s.onerror = function () {
+                window.SERIE_RAW = old;
+                alert("Impossible de charger la série en local.\nOuvrez cette page via un serveur local, par exemple :\n\npython -m http.server");
+              };
+              document.head.appendChild(s);
+            } else {
+              alert("Impossible de charger la série : " + e.message);
+            }
           });
       }
 

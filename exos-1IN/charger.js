@@ -39,7 +39,10 @@
     document.body.appendChild(menu);
   }
 
-  var DATA_SCRIPT = "data/" + dataFile + ".js";
+  var _scripts = document.getElementsByTagName('script');
+  var _thisScript = document.currentScript || _scripts[_scripts.length - 1];
+  var _scriptDir = _thisScript.src.substring(0, _thisScript.src.lastIndexOf('/') + 1);
+  var DATA_SCRIPT = _scriptDir + "data/" + dataFile + ".js";
 
   /* ---------- Dépendances ---------- */
   var STYLES = ["vendor/codemirror/codemirror.css", "css/style.css"];

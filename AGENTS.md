@@ -2,10 +2,10 @@
 
 ## Structure d'un package SCORM
 
-Chaque série est un dossier nommé `serieXX-scorm-leger/` contenant :
+Chaque série est un dossier nommé `exosXXX/` contenant :
 
 ```
-serieXX-scorm-leger/
+exos-1IN/
 ├── index.html          # Page principale (modèle ci-dessous)
 ├── charger.js          # Chargeur de dépendances (copie inchangée de serie04)
 ├── imsmanifest.xml     # Manifeste SCORM (adapter l'identifiant et le titre)
@@ -175,7 +175,7 @@ La sortie console dans Skulpt est une chaîne brute avec `\n` pour les retours �
 
 ## Exemple complet : série 02b (print imbriqué)
 
-Voir le dossier `serie02-scorm-leger/data/serie02b.js` comme référence. Cette série :
+Voir le dossier `exos-1IN/data/serie02b.js` comme référence. Cette série :
 - N'utilise **pas** de dessin turtle (`figure: false` partout)
 - Utilise exclusivement `kind: "source"` et `kind: "output"`
 - A 10 exercices issus du notebook `02b_for_print_imbriques.ipynb`
