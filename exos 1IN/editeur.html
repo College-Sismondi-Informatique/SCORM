@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Éditeur de séries</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; padding: 20px; max-width: 1400px; margin: auto; background: #f7f8fa; }
+    h1 { color: #1a3c6c; }
+    .serie-select { margin-bottom: 24px; }
+    select, button { font-size: 1rem; padding: 8px 14px; border-radius: 6px; border: 1px solid #cfd8e6; }
+    button { background: #1a3c6c; color: white; cursor: pointer; border: none; }
+    button:hover { background: #0f2950; }
+    .exercice { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+    .exercice h3 { margin-top: 0; color: #334155; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+    .exercice h3 span.id { font-family: monospace; font-size: 0.85rem; color: #64748b; }
+    label { display: block; margin: 10px 0 4px; font-weight: 600; font-size: 0.9rem; color: #475569; }
+    input[type="text"], textarea { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 0.95rem; }
+    textarea { min-height: 240px; font-family: monospace; resize: vertical; }
+    .checks-box { background: #f1f5f9; border-radius: 8px; padding: 12px; margin-top: 10px; }
+    .check-item { background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+    .check-item label { margin-top: 4px; font-size: 0.82rem; }
+    .check-item input, .check-item textarea { font-size: 0.85rem; padding: 5px 8px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .row > label { flex: 1 1 200px; }
+    .actions-bar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #e2e8f0; padding: 16px; display: flex; gap: 12px; justify-content: center; margin: 20px -20px -20px; }
+
+    .editor-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
+    .editor-tabs button { background: #e2e8f0; color: #334155; font-size: 0.8rem; padding: 4px 10px; }
+    .editor-tabs button.active { background: #1a3c6c; color: white; }
+
+    .md-toolbar { display: flex; gap: 4px; flex-wrap: wrap; padding: 4px; background: #f1f5f9; border: 1px solid #cbd5e1; border-bottom: none; border-radius: 6px 6px 0 0; }
+    .md-toolbar button { font-size: 0.8rem; padding: 3px 10px; background: white; color: #334155; border: 1px solid #cbd5e1; border-radius: 4px; }
+    .md-toolbar button:hover { background: #e2e8f0; }
+
+    .preview-box { display: none; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fafafa; min-height: 240px; }
+
+    .CodeMirror { border: 1px solid #cbd5e1; border-radius: 6px; height: auto; min-height: 240px; width: 100%; clear: both; }
+  </style>
+</head>
+<body>
+  <h1>Éditeur de séries SCORM</h1>
+
+  <div class="serie-select">
+    <label for="seriePick">Série à éditer :</label>
+    <select id="seriePick">
+      <option value="">-- Choisir --</option>
+      <option value="serie01a">1a – Premier programme (turtle)</option>
+      <option value="serie01b">1b – Compléments print</option>
+      <option value="serie01c">1c – Compléments turtle et images</option>
+      <option value="serie02a">2a – Boucles for (turtle)</option>
+      <option value="serie02b">2b – Boucles for et print</option>
+      <option value="serie03">3 – Fonctions simples (turtle)</option>
+      <option value="serie04">4 – Fonctions avec paramètres</option>
+      <option value="serie05a">5a – Variables</option>
+      <option value="serie05b">5b – Types et entrée-sortie</option>
+      <option value="serie06">6 – Les conditions</option>
+      <option value="serie07">7 – Boucle while</option>
+      <option value="serie07p1">7.1 – Boucle while (partie 1)</option>
+      <option value="serie07p2">7.2 – Boucle while (partie 2)</option>
+      <option value="serie08">8 – Fonctions avec return</option>
+    </select>
+    <button id="btnLoad">Charger</button>
+    <button id="btnNew" style="background:#0f766e">Nouvelle série</button>
+  </div>
+
+  <div id="serieMeta" style="display:none">
+    <div class="row">
+      <label>ID série <input type="text" id="serieId"></label>
+      <label>Titre <input type="text" id="serieTitre"></label>
+    </div>
+  </div>
+
+  <div id="exercices"></div>
+
+  <div id="globalActions" class="actions-bar" style="display:none">
+    <button id="btnDownload" style="background:#065f46">💾 Enregistrer le .js</button>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      let serie = null;
+      let cmInstances = [];
+
+      function el(tag, attrs) {
+        const e = document.createElement(tag);
+        if (attrs) {
+          for (const k in attrs) {
+            if (k === 'dataset') {
+              for (const dk in attrs[k]) e.dataset[dk] = attrs[k][dk];
+            } else {
+              e[k] = attrs[k];
+            }
+          }
+        }
+        return e;
+      }
+
+      function escapeJsString(str) {
+        return JSON.stringify(str);
+      }
+
+      function buildYaml(serieObj) {
+        const lines = [];
+        lines.push("id: " + serieObj.id);
+        lines.push("titre: " + serieObj.titre);
+        lines.push("exercices:");
+        for (const ex of serieObj.exercices) {
+          lines.push("  -   id:");
+          for (const l of ex.id.split("\n")) lines.push("        " + l);
+          lines.push("      titre:");
+          for (const l of ex.titre.split("\n")) lines.push("        " + l);
+          lines.push("      note: " + (ex.note ? "true" : "false"));
+          lines.push("      figure: " + (ex.figure ? "true" : "false"));
+          lines.push("      enonce:");
+          for (const l of ex.enonce.split("\n")) lines.push("        " + l);
+          lines.push("      code:");
+          for (const l of ex.code.split("\n")) lines.push("        " + l);
+          if (ex.solutions && ex.solutions.length) {
+            lines.push("      solutions:");
+            for (const sol of ex.solutions) {
+              lines.push("        -       |");
+              for (const l of sol.split("\n")) lines.push("                    " + l);
+            }
+          } else {
+            lines.push("      solutions: []");
+          }
+          if (ex.checks && ex.checks.length) {
+            lines.push("      checks:");
+            for (const ck of ex.checks) {
+              lines.push("        -       id:");
+              for (const l of ck.id.split("\n")) lines.push("                    " + l);
+              lines.push("                kind:");
+              for (const l of ck.kind.split("\n")) lines.push("                    " + l);
+              ["re", "name", "target", "label", "fail"].forEach(function (k) {
+                if (ck[k] !== undefined) {
+                  lines.push("                " + k + ":");
+                  for (const l of String(ck[k]).split("\n")) lines.push("                    " + l);
+                }
+              });
+              if (ck.opts) {
+                lines.push("                opts:");
+                for (const ok in ck.opts) {
+                  lines.push("                  " + ok + ": " + (ck.opts[ok] ? "true" : "false"));
+                }
+              }
+              if (ck.hint) {
+                lines.push("                hint:");
+                if (typeof ck.hint === "object") {
+                  for (const hk in ck.hint) {
+                    lines.push("                  " + hk + ":");
+                    for (const l of String(ck.hint[hk]).split("\n")) lines.push("                    " + l);
+                  }
+                } else {
+                  for (const l of String(ck.hint).split("\n")) lines.push("                    " + l);
+                }
+              }
+            }
+          } else {
+            lines.push("      checks: []");
+          }
+        }
+        return lines;
+      }
+
+      function setEnonceMode(container, mode) {
+        const ta = container.querySelector('textarea[data-field="enonce"]');
+        const previewBox = container.querySelector('.preview-box');
+        const tabs = container.querySelectorAll('.editor-tabs button');
+
+        tabs.forEach(function (b) { b.classList.remove('active'); });
+        container.querySelector('[data-mode="' + mode + '"]').classList.add('active');
+
+        if (mode === 'source') {
+          ta.style.display = 'block';
+          if (previewBox) previewBox.style.display = 'none';
+        } else if (mode === 'preview') {
+          ta.style.display = 'none';
+          if (previewBox) {
+            previewBox.style.display = 'block';
+            const html = (typeof marked !== 'undefined') ? marked.parse(ta.value) : ta.value;
+            previewBox.innerHTML = html;
+            if (typeof Prism !== 'undefined') Prism.highlightAllUnder(previewBox);
+          }
+        }
+      }
+
+      function insertMd(ta, before, after, placeholder) {
+        placeholder = placeholder || '';
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const text = ta.value;
+        const selected = text.substring(start, end) || placeholder;
+        const replacement = before + selected + after;
+        ta.value = text.substring(0, start) + replacement + text.substring(end);
+        ta.selectionStart = start + before.length;
+        ta.selectionEnd = start + before.length + selected.length;
+        ta.focus();
+      }
+
+      function createMdToolbar(ta) {
+        const bar = el('div', { className: 'md-toolbar' });
+        const btns = [
+          { label: 'B', action: function () { insertMd(ta, '**', '**', 'gras'); } },
+          { label: 'I', action: function () { insertMd(ta, '*', '*', 'italique'); } },
+          { label: 'Titre', action: function () { insertMd(ta, '### ', '\n', 'Titre'); } },
+          { label: '• Liste', action: function () { insertMd(ta, '- ', '\n', 'item'); } },
+          { label: '1. Liste', action: function () { insertMd(ta, '1. ', '\n', 'item'); } },
+          { label: '\u0060code\u0060', action: function () { insertMd(ta, '\u0060', '\u0060', 'code'); } },
+          { label: 'Bloc code', action: function () { insertMd(ta, '```python\n', '\n```\n', 'code'); } },
+          { label: 'Lien', action: function () { insertMd(ta, '[', '](https://)', 'texte'); } },
+          { label: 'Image', action: function () { insertMd(ta, '![', '](https://)', 'alt'); } },
+          { label: 'HR', action: function () { insertMd(ta, '\n---\n', '', ''); } },
+        ];
+        btns.forEach(function (b) {
+          const btn = el('button', { type: 'button', textContent: b.label });
+          btn.onmousedown = function (e) { e.preventDefault(); b.action(); };
+          bar.appendChild(btn);
+        });
+        return bar;
+      }
+
+      function renderCheck(check) {
+        const box = el("div", { className: "check-item" });
+
+        const fields = [
+          { k: "id", label: "ID du check" },
+          { k: "kind", label: "Kind (source, output, shape, defined, params, calls)" },
+          { k: "re", label: "Regex (re)" },
+          { k: "name", label: "Name" },
+          { k: "target", label: "Target (<program> ou nom fonction)" },
+          { k: "label", label: "Label" },
+          { k: "fail", label: "Message d'échec" }
+        ];
+
+        fields.forEach(function (f) {
+          const lbl = el("label", { textContent: f.label });
+          const inp = el("input", { type: "text", value: check[f.k] || "" });
+          inp.dataset.field = f.k;
+          box.appendChild(lbl);
+          box.appendChild(inp);
+        });
+
+        const optsBox = el("div");
+        optsBox.style.marginTop = "8px";
+        optsBox.innerHTML = "<b style=\"font-size:0.82rem\">Opts :</b> ";
+        ["rotate", "mirror", "scale", "color"].forEach(function (ok) {
+          const lbl = el("label", { textContent: ok, style: "display:inline;font-weight:normal;margin-left:10px" });
+          const cb = el("input", { type: "checkbox" });
+          cb.checked = !!(check.opts && check.opts[ok]);
+          cb.dataset.opt = ok;
+          lbl.prepend(cb);
+          optsBox.appendChild(lbl);
+        });
+        box.appendChild(optsBox);
+
+        const btnDel = el("button", { textContent: "🗑 Supprimer ce check", style: "margin-top:8px;background:#991b1b" });
+        btnDel.onclick = function () { box.remove(); };
+        box.appendChild(btnDel);
+
+        return box;
+      }
+
+      function renderExercice(ex, idx) {
+        const div = el("div", { className: "exercice" });
+        div.dataset.index = String(idx);
+
+        const h3 = el("h3");
+        const idSpan = el("span", { className: "id", textContent: ex.id });
+        h3.appendChild(el("span", { textContent: ex.titre || "Sans titre" }));
+        h3.appendChild(idSpan);
+        div.appendChild(h3);
+
+        const row1 = el("div", { className: "row" });
+        const lblId = el("label", { textContent: "ID" });
+        const inpId = el("input", { type: "text", value: ex.id });
+        inpId.dataset.field = "id";
+        lblId.appendChild(inpId);
+
+        const lblTitre = el("label", { textContent: "Titre" });
+        const inpTitre = el("input", { type: "text", value: ex.titre || "" });
+        inpTitre.dataset.field = "titre";
+        lblTitre.appendChild(inpTitre);
+
+        const lblNote = el("label", { textContent: "Note ?", style: "display:flex;align-items:center;gap:6px" });
+        const cbNote = el("input", { type: "checkbox" });
+        cbNote.checked = !!ex.note;
+        cbNote.dataset.field = "note";
+        lblNote.prepend(cbNote);
+
+        const lblFigure = el("label", { textContent: "Figure turtle ?", style: "display:flex;align-items:center;gap:6px" });
+        const cbFigure = el("input", { type: "checkbox" });
+        cbFigure.checked = !!ex.figure;
+        cbFigure.dataset.field = "figure";
+        lblFigure.prepend(cbFigure);
+
+        row1.appendChild(lblId);
+        row1.appendChild(lblTitre);
+        row1.appendChild(lblNote);
+        row1.appendChild(lblFigure);
+        div.appendChild(row1);
+
+        // ----- Enoncé : Source (textarea) + Preview -----
+        const enonceWrap = el('div');
+        const tabs = el('div', { className: 'editor-tabs' });
+        const btnSource = el('button', { type: 'button', textContent: 'Source (MD/HTML)', dataset: { mode: 'source' }, className: 'active' });
+        const btnPreview = el('button', { type: 'button', textContent: 'Preview', dataset: { mode: 'preview' } });
+        tabs.appendChild(btnSource);
+        tabs.appendChild(btnPreview);
+
+        const taEnonce = el("textarea", { value: ex.enonce || "" });
+        taEnonce.dataset.field = "enonce";
+
+        const previewBox = el('div', { className: 'preview-box' });
+
+        btnSource.onclick = function () { setEnonceMode(enonceWrap, 'source'); };
+        btnPreview.onclick = function () { setEnonceMode(enonceWrap, 'preview'); };
+
+        // Raccourcis clavier
+        taEnonce.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault();
+            setEnonceMode(enonceWrap, 'preview');
+            previewBox.focus();
+          }
+        });
+        previewBox.tabIndex = 0;
+        previewBox.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            setEnonceMode(enonceWrap, 'source');
+            taEnonce.focus();
+          }
+        });
+
+        div.appendChild(el('label', { textContent: 'Énoncé (Markdown / HTML)' }));
+        enonceWrap.appendChild(tabs);
+        enonceWrap.appendChild(createMdToolbar(taEnonce));
+        enonceWrap.appendChild(taEnonce);
+        enonceWrap.appendChild(previewBox);
+        div.appendChild(enonceWrap);
+
+        // ----- Code initial avec CodeMirror -----
+        const lblCode = el("label", { textContent: "Code initial (Python)" });
+        const codeWrap = el('div');
+        const taCode = el("textarea", { value: ex.code || "" });
+        taCode.dataset.field = "code";
+        codeWrap.appendChild(taCode);
+        div.appendChild(lblCode);
+        div.appendChild(codeWrap);
+
+        const cmCode = CodeMirror.fromTextArea(taCode, {
+          mode: 'python',
+          lineNumbers: true,
+          matchBrackets: true,
+          indentUnit: 4,
+          viewportMargin: Infinity
+        });
+        cmInstances.push(cmCode);
+
+        // ----- Solutions avec CodeMirror -----
+        const lblSol = el("label", { textContent: "Solution(s) (Python)" });
+        const solWrap = el('div');
+        const taSol = el("textarea", { value: (ex.solutions || []).join("\n---SOLUTION---\n") });
+        taSol.dataset.field = "solutions";
+        solWrap.appendChild(taSol);
+        div.appendChild(lblSol);
+        div.appendChild(solWrap);
+
+        const cmSol = CodeMirror.fromTextArea(taSol, {
+          mode: 'python',
+          lineNumbers: true,
+          matchBrackets: true,
+          indentUnit: 4,
+          viewportMargin: Infinity
+        });
+        cmInstances.push(cmSol);
+
+        // checks
+        const lblChecks = el("label", { textContent: "Checks" });
+        div.appendChild(lblChecks);
+        const checksBox = el("div", { className: "checks-box" });
+        checksBox.id = "checks-" + idx;
+        (ex.checks || []).forEach(function (ck) {
+          checksBox.appendChild(renderCheck(ck));
+        });
+        div.appendChild(checksBox);
+
+        const btnAddCheck = el("button", { textContent: "+ Ajouter un check", style: "margin-top:6px;background:#475569" });
+        btnAddCheck.onclick = function () {
+          checksBox.appendChild(renderCheck({ id: "", kind: "source", re: "", label: "", fail: "" }));
+        };
+        div.appendChild(btnAddCheck);
+
+        // Actions: ajouter après / supprimer
+        const actionsRow = el('div', { style: 'display:flex;gap:8px;margin-top:14px;' });
+        const btnAddAfter = el("button", { textContent: "➕ Insérer un exercice après", style: "background:#0f766e" });
+        btnAddAfter.onclick = function () {
+          const newEx = {
+            id: "exN",
+            titre: "Nouvel exercice",
+            note: true,
+            figure: false,
+            enonce: "",
+            code: "# Écrivez votre code ici",
+            solutions: [],
+            checks: []
+          };
+          const newDiv = renderExercice(newEx, 0);
+          div.parentNode.insertBefore(newDiv, div.nextSibling);
+          refreshAllCm();
+          newDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+        const btnDelEx = el("button", { textContent: "🗑 Supprimer cet exercice", style: "background:#7f1d1d" });
+        btnDelEx.onclick = function () { if (confirm("Supprimer cet exercice ?")) div.remove(); };
+        actionsRow.appendChild(btnAddAfter);
+        actionsRow.appendChild(btnDelEx);
+        div.appendChild(actionsRow);
+
+        return div;
+      }
+
+      function gatherData() {
+        const out = {
+          id: document.getElementById("serieId").value.trim(),
+          titre: document.getElementById("serieTitre").value.trim(),
+          exercices: []
+        };
+        const container = document.getElementById("exercices");
+        Array.from(container.children).forEach(function (div) {
+          const ex = {};
+          div.querySelectorAll("[data-field]").forEach(function (inp) {
+            const k = inp.dataset.field;
+            if (k === "note" || k === "figure") {
+              ex[k] = inp.checked;
+            } else if (k === "solutions") {
+              const raw = inp.value.trim();
+              ex[k] = raw ? raw.split(/\n?---SOLUTION---\n?/) : [];
+            } else if (k === "code") {
+              ex[k] = inp.value;
+            } else {
+              ex[k] = inp.value;
+            }
+          });
+          // CodeMirror instances
+          const textareas = div.querySelectorAll('textarea');
+          textareas.forEach(function (ta) {
+            if (ta.CodeMirror) {
+              const val = ta.CodeMirror.getValue();
+              if (ta.dataset.field === 'code') ex.code = val;
+              if (ta.dataset.field === 'solutions') {
+                const raw = val.trim();
+                ex.solutions = raw ? raw.split(/\n?---SOLUTION---\n?/) : [];
+              }
+              if (ta.dataset.field === 'enonce') ex.enonce = val;
+            }
+          });
+          // checks
+          const checks = [];
+          div.querySelectorAll(".check-item").forEach(function (cbox) {
+            const ck = {};
+            cbox.querySelectorAll("[data-field]").forEach(function (inp) {
+              ck[inp.dataset.field] = inp.value;
+            });
+            const opts = {};
+            cbox.querySelectorAll("[data-opt]").forEach(function (cb) {
+              opts[cb.dataset.opt] = cb.checked;
+            });
+            ck.opts = opts;
+            checks.push(ck);
+          });
+          ex.checks = checks;
+          out.exercices.push(ex);
+        });
+        return out;
+      }
+
+      function exportJs(serieObj) {
+        const yamlLines = buildYaml(serieObj);
+        const jsLines = yamlLines.map(function (l) { return "  " + escapeJsString(l); });
+        const js = "window.SERIE_RAW = [\n" + jsLines.join(",\n") + "\n].join(\"\\n\");\n";
+        return js;
+      }
+
+      function refreshAllCm() {
+        requestAnimationFrame(function () {
+          setTimeout(function () {
+            cmInstances.forEach(function (cm) { cm.refresh(); });
+          }, 50);
+        });
+      }
+
+      function loadSerie(id) {
+        fetch("data/" + id + ".js")
+          .then(function (r) { return r.text(); })
+          .then(function (text) {
+            const old = window.SERIE_RAW;
+            try {
+              eval(text);
+            } catch (e) {
+              alert("Erreur lors du chargement du fichier JS : " + e.message);
+              window.SERIE_RAW = old;
+              return;
+            }
+            const yamlText = window.SERIE_RAW;
+            window.SERIE_RAW = old;
+            serie = jsyaml.load(yamlText);
+            if (!serie || !serie.exercices) {
+              alert("YAML invalide ou vide");
+              return;
+            }
+            document.getElementById("serieId").value = serie.id || "";
+            document.getElementById("serieTitre").value = serie.titre || "";
+            document.getElementById("serieMeta").style.display = "block";
+            const container = document.getElementById("exercices");
+            container.innerHTML = "";
+            cmInstances = [];
+            serie.exercices.forEach(function (ex, i) {
+              container.appendChild(renderExercice(ex, i));
+            });
+            document.getElementById("globalActions").style.display = "flex";
+            refreshAllCm();
+          })
+          .catch(function (e) {
+            alert("Impossible de charger la série : " + e.message);
+          });
+      }
+
+      document.getElementById("btnLoad").addEventListener("click", function () {
+        const id = document.getElementById("seriePick").value;
+        if (!id) return;
+        loadSerie(id);
+      });
+
+      document.getElementById("btnNew").addEventListener("click", function () {
+        serie = { id: "serieXX", titre: "Nouvelle série", exercices: [] };
+        document.getElementById("serieId").value = serie.id;
+        document.getElementById("serieTitre").value = serie.titre;
+        document.getElementById("serieMeta").style.display = "block";
+        document.getElementById("exercices").innerHTML = "";
+        cmInstances = [];
+        document.getElementById("globalActions").style.display = "flex";
+        refreshAllCm();
+      });
+
+      document.getElementById("btnDownload").addEventListener("click", function () {
+        const data = gatherData();
+        const js = exportJs(data);
+        const blob = new Blob([js], { type: "application/javascript" });
+
+        if (typeof window.showSaveFilePicker === 'function') {
+          window.showSaveFilePicker({
+            suggestedName: data.id + ".js",
+            types: [{ description: "Fichier JavaScript", accept: { "application/javascript": [".js"] } }]
+          }).then(function (handle) {
+            return handle.createWritable();
+          }).then(function (writable) {
+            writable.write(blob);
+            return writable.close();
+          }).catch(function (e) {
+            if (e.name !== 'AbortError') {
+              alert("Erreur lors de l'enregistrement : " + e.message);
+            }
+          });
+        } else {
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = data.id + ".js";
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

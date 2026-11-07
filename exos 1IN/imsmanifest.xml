@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="cours_python_1ere" version="1"
+          xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
+          xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"
+          xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3"
+          xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3"
+          xmlns:imsss="http://www.imsglobal.org/xsd/imsss"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd
+                              http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd
+                              http://www.adlnet.org/xsd/adlseq_v1p3 adlseq_v1p3.xsd
+                              http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd
+                              http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>2004 4th Edition</schemaversion>
+  </metadata>
+  <organizations default="org_cours">
+    <organization identifier="org_cours">
+      <title>Cours Python — 1ère</title>
+      <item identifier="item_serie01a" identifierref="res_serie01a">
+        <title>1a – Premier programme</title>
+      </item>
+      <item identifier="item_serie01b" identifierref="res_serie01b">
+        <title>1b – Compléments print</title>
+      </item>
+      <item identifier="item_serie01c" identifierref="res_serie01c">
+        <title>1c – Compléments turtle</title>
+      </item>
+      <item identifier="item_serie02a" identifierref="res_serie02a">
+        <title>2a – Boucles for (turtle)</title>
+      </item>
+      <item identifier="item_serie02b" identifierref="res_serie02b">
+        <title>2b – Boucles for et print</title>
+      </item>
+      <item identifier="item_serie03" identifierref="res_serie03">
+        <title>3 – Fonctions simples</title>
+      </item>
+      <item identifier="item_serie04" identifierref="res_serie04">
+        <title>4 – Fonctions avec paramètres</title>
+      </item>
+      <item identifier="item_serie05a" identifierref="res_serie05a">
+        <title>5a – Variables</title>
+      </item>
+      <item identifier="item_serie05b" identifierref="res_serie05b">
+        <title>5b – Types et entrée-sortie</title>
+      </item>
+      <item identifier="item_serie06" identifierref="res_serie06">
+        <title>6 – Les conditions</title>
+      </item>
+      <item identifier="item_serie07" identifierref="res_serie07">
+        <title>7 – Boucle while</title>
+      </item>
+      <item identifier="item_serie07p1" identifierref="res_serie07p1">
+        <title>7.1 – Boucle while (partie 1)</title>
+      </item>
+      <item identifier="item_serie07p2" identifierref="res_serie07p2">
+        <title>7.2 – Boucle while (partie 2)</title>
+      </item>
+      <item identifier="item_serie08" identifierref="res_serie08">
+        <title>8 – Fonctions avec return</title>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="res_serie01a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01a">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie01a.js"/>
+    </resource>
+    <resource identifier="res_serie01b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01b">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie01b.js"/>
+    </resource>
+    <resource identifier="res_serie01c" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01c">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie01c.js"/>
+    </resource>
+    <resource identifier="res_serie02a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie02a">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie02a.js"/>
+    </resource>
+    <resource identifier="res_serie02b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie02b">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie02b.js"/>
+    </resource>
+    <resource identifier="res_serie03" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie03">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie03.js"/>
+    </resource>
+    <resource identifier="res_serie04" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie04">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie04.js"/>
+    </resource>
+    <resource identifier="res_serie05a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie05a">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie05a.js"/>
+    </resource>
+    <resource identifier="res_serie05b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie05b">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie05b.js"/>
+    </resource>
+    <resource identifier="res_serie06" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie06">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie06.js"/>
+    </resource>
+    <resource identifier="res_serie07" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie07.js"/>
+    </resource>
+    <resource identifier="res_serie07p1" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07p1">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie07p1.js"/>
+    </resource>
+    <resource identifier="res_serie07p2" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07p2">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie07p2.js"/>
+    </resource>
+    <resource identifier="res_serie08" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie08">
+      <file href="index.html"/>
+      <file href="charger.js"/>
+      <file href="data/serie08.js"/>
+    </resource>
+  </resources>
+</manifest>

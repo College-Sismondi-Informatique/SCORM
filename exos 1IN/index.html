@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Série 02</title>
+  <script>
+    var COMMUN = "https://scormcdg.github.io/python/script/v1/";
+  </script>
+  <style>
+    /* Mode sans tortue : la console prend la place du dessin */
+    body.sans-tortue .espace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    body.sans-tortue .colonne-dessin { display: flex; flex-direction: column; gap: 12px; }
+    body.sans-tortue .feuille,
+    body.sans-tortue .vitesse,
+    body.sans-tortue #btn-finir { display: none !important; }
+    body.sans-tortue .zone-console { margin-top: 0; flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+    body.sans-tortue .console { flex: 1 1 auto; min-height: 260px; max-height: none; }
+  </style>
+  <script src="charger.js"></script>
+  <script>
+    (function () {
+      function move() {
+        if (!document.body.classList.contains("sans-tortue")) return;
+        var zone = document.querySelector(".zone-console");
+        var col  = document.querySelector(".colonne-dessin");
+        if (zone && col && zone.parentElement !== col) col.insertBefore(zone, col.firstChild);
+      }
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", move);
+      else move();
+      var o = new MutationObserver(move);
+      o.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    })();
+  </script>
+</head>
+<body>
+  <header class="entete">
+    <h1 id="titre-serie"></h1>
+    <p id="progression" class="progression"></p>
+  </header>
+
+  <nav id="onglets" class="onglets" aria-label="Exercices"></nav>
+
+  <main class="espace">
+    <div class="colonne-code">
+      <section class="enonce" aria-labelledby="titre-exercice">
+        <h2 id="titre-exercice"></h2>
+        <figure id="figure-attendue" class="figure-attendue" hidden>
+          <canvas id="canvas-figure" width="150" height="150"></canvas>
+          <figcaption>Figure attendue</figcaption>
+        </figure>
+        <div id="texte-enonce"></div>
+      </section>
+
+      <div id="editeur" class="editeur"></div>
+
+      <div class="actions">
+        <button id="btn-executer" type="button" class="bouton principal">Exécuter <kbd>Ctrl+Entrée</kbd></button>
+        <button id="btn-verifier" type="button" class="bouton secondaire">Vérifier</button>
+        <button id="btn-recommencer" type="button" class="bouton discret">Recommencer</button>
+      </div>
+
+      <section class="zone-console">
+        <h3>Console</h3>
+        <div id="console" class="console vide" role="log" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <div class="colonne-dessin">
+      <div class="feuille">
+        <canvas id="canvas-tortue" aria-label="Dessin de la tortue"></canvas>
+      </div>
+
+      <div class="vitesse">
+        <label for="vitesse">Vitesse</label>
+        <input id="vitesse" type="range" min="1" max="11" step="1" value="6">
+        <output id="vitesse-valeur" for="vitesse"></output>
+        <button id="btn-finir" type="button" class="bouton discret" hidden>Terminer le dessin</button>
+        <p class="aide">Si le programme utilise <code>speed()</code>, c'est sa vitesse qui l'emporte.</p>
+      </div>
+
+      <section id="criteres" class="criteres" hidden>
+        <h3>Vérification</h3>
+        <p id="bilan" class="bilan" hidden></p>
+        <ul id="liste-criteres"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer id="pied" class="pied"></footer>
+
+</body>
+</html>
