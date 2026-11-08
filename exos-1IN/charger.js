@@ -61,8 +61,8 @@
     "vendor/codemirror/codemirror.js",
     "vendor/codemirror/python.js",
     "vendor/codemirror/matchbrackets.js",
-    "vendor/skulpt/skulpt.min.js",
-    "vendor/skulpt/skulpt-stdlib.js",
+    //"vendor/skulpt/skulpt.min.js", // commenter pour passer de skulpt à pyodide
+    //"vendor/skulpt/skulpt-stdlib.js", // commenter pour passer de skulpt à pyodide
     "js/couleurs.js",
     "js/turtle.js",
     "js/engine.js",
