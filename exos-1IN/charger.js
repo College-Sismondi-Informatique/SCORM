@@ -52,8 +52,8 @@
     document.body.appendChild(menu);
   }
 
-  var DATA_BASE = "https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/";
-  var DATA_SCRIPT = DATA_BASE + dataFile + ".js";
+  var dataUrlParam = params.get("data_url");
+  var DATA_SCRIPT = dataUrlParam ? new URL(dataUrlParam, location.href).href : ("data/" + dataFile + ".js");
 
   /* ---------- Dépendances ---------- */
   var STYLES = ["vendor/codemirror/codemirror.css", "css/style.css"];

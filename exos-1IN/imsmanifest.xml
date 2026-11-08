@@ -63,59 +63,59 @@
     </organization>
   </organizations>
   <resources>
-    <resource identifier="res_serie01a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01a">
+    <resource identifier="res_serie01a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01a&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie01a.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie01b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01b">
+    <resource identifier="res_serie01b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01b&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie01b.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie01c" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01c">
+    <resource identifier="res_serie01c" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01c&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie01c.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie02a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie02a">
+    <resource identifier="res_serie02a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie02a&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie02a.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie02b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie02b">
+    <resource identifier="res_serie02b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie02b&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie02b.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie03" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie03">
+    <resource identifier="res_serie03" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie03&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie03.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie04" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie04">
+    <resource identifier="res_serie04" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie04&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie04.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie05a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie05a">
+    <resource identifier="res_serie05a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie05a&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie05a.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie05b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie05b">
+    <resource identifier="res_serie05b" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie05b&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie05b.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie06" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie06">
+    <resource identifier="res_serie06" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie06&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie06.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie07" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07">
+    <resource identifier="res_serie07" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie07.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie07p1" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07p1">
+    <resource identifier="res_serie07p1" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07p1&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie07p1.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie07p2" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07p2">
+    <resource identifier="res_serie07p2" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie07p2&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie07p2.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>
-    <resource identifier="res_serie08" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie08">
+    <resource identifier="res_serie08" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie08&amp;data_url=https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serie08.js">
       <file href="index.html"/>
       <file href="charger.js"/>
     </resource>

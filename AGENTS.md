@@ -2,30 +2,50 @@
 
 ## Structure d'un package SCORM
 
-Chaque série est un dossier nommé `exosXXX/` contenant :
+Le package SCORM est ultra-léger. Il ne contient que :
 
 ```
 exos-1IN/
 ├── index.html          # Page principale (modèle ci-dessous)
-├── charger.js          # Chargeur de dépendances (copie inchangée de serie04)
-├── imsmanifest.xml     # Manifeste SCORM (adapter l'identifiant et le titre)
-└── data/
-    └── serieXX.js      # Données des exercices (voir format détaillé ci-dessous)
+├── charger.js          # Chargeur de dépendances
+└── imsmanifest.xml     # Manifeste SCORM
 ```
 
-### `index.html` (inchangé sauf titre et `EXERCICES`)
-- Modifier `<title>`
-- Modifier `var EXERCICES = "data/serieXX.js";`
-- Le reste est identique au modèle serie04
+### Où sont les données ?
+
+Par défaut, les données des exercices (fichiers `data/serieXX.js`) sont chargées depuis un **chemin relatif** :
+
+```
+data/serieXX.js
+```
+
+Ce chemin est résolu par rapport à la page `index.html`. Donc :
+- En local (ouverture directe ou serveur local), il charge depuis le disque.
+- Sur GitHub Pages, il charge automatiquement depuis `https://college-sismondi-informatique.github.io/SCORM/exos-1IN/data/serieXX.js`.
+
+### Utiliser une source distante ou personnalisée
+
+Dans `imsmanifest.xml`, chaque ressource peut redéfinir le chemin des données avec le paramètre **`data_url`** :
+
+```xml
+<resource identifier="res_serie01a" type="webcontent" adlcp:scormType="sco" href="index.html?data=serie01a&amp;data_url=https://monsite.com/data/serie01a.js">
+  <file href="index.html"/>
+  <file href="charger.js"/>
+</resource>
+```
+
+- **Sans `data_url`** : charge depuis `data/serieXX.js` (résolution relative, fonctionne partout).
+- **Chemin relatif** (`data_url=data/serie01a.js`) : force un emplacement précis. Le fichier doit être inclus dans le zip via `<file href="..."/>` s'il est local.
+- **URL absolue** (`data_url=https://monsite.com/data/serieXX.js`) : les données sont chargées depuis un serveur externe. Le package SCORM n'a même pas besoin de les contenir.
+
+### `index.html`
+- Modifier `<title>` si besoin
+- Le reste est identique au modèle
 
 ### `charger.js`
 - Copier tel quel depuis n'importe quelle série existante.
-- Il charge les dépendances depuis `COMMUN` (GitHub) puis le fichier d'exercices.
-
-### `imsmanifest.xml`
-- Adapter `identifier`, `organization/@identifier`, `item/@identifier`, `resource/@identifier`
-- Adapter les titres
-- Lister les 3 fichiers (`index.html`, `charger.js`, `data/serieXX.js`)
+- Il lit `data_url` depuis l'URL (`?data_url=...`), sinon charge depuis GitHub Pages.
+- Charge ensuite les dépendances depuis `COMMUN` (GitHub) puis les données d'exercices.
 
 ---
 
