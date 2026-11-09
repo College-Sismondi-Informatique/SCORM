@@ -70,6 +70,8 @@
       <option value="serie08">8 – Fonctions avec return</option>
     </select>
     <button id="btnLoad">Charger</button>
+    <button id="btnLoadLocal">📂 Charger un fichier local</button>
+    <input type="file" id="fileInput" accept=".js" style="display:none">
     <button id="btnNew" style="background:#0f766e">Nouvelle série</button>
   </div>
 
@@ -444,10 +446,22 @@
           refreshAllCm();
           newDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
+        const btnDup = el("button", { textContent: "📋 Dupliquer l'exercice", style: "background:#7c3aed" });
+        btnDup.onclick = function () {
+          cmInstances.forEach(function (cm) { if (cm.save) cm.save(); });
+          var exData = gatherSingle(div);
+          var newEx = JSON.parse(JSON.stringify(exData));
+          newEx.id = newEx.id + "_copy";
+          var newDiv = renderExercice(newEx, 0);
+          div.parentNode.insertBefore(newDiv, div.nextSibling);
+          refreshAllCm();
+          newDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
         const btnDelEx = el("button", { textContent: "🗑 Supprimer cet exercice", style: "background:#7f1d1d" });
         btnDelEx.onclick = function () { if (confirm("Supprimer cet exercice ?")) div.remove(); };
         actionsRow.appendChild(btnPreviewExo);
         actionsRow.appendChild(btnAddAfter);
+        actionsRow.appendChild(btnDup);
         actionsRow.appendChild(btnDelEx);
         div.appendChild(actionsRow);
 
@@ -529,28 +543,27 @@
         });
       }
 
+      function loadFromSerieRaw(yamlText) {
+        serie = jsyaml.load(yamlText);
+        if (!serie || !serie.exercices) {
+          alert("YAML invalide ou vide");
+          return;
+        }
+        document.getElementById("serieId").value = serie.id || "";
+        document.getElementById("serieTitre").value = serie.titre || "";
+        document.getElementById("serieMeta").style.display = "block";
+        var container = document.getElementById("exercices");
+        container.innerHTML = "";
+        cmInstances = [];
+        serie.exercices.forEach(function (ex, i) {
+          container.appendChild(renderExercice(ex, i));
+        });
+        document.getElementById("globalActions").style.display = "flex";
+        refreshAllCm();
+      }
+
       function loadSerie(id) {
         var path = "exos-1IN/data/" + id + ".js";
-
-        function processSerieRaw() {
-          var yamlText = window.SERIE_RAW;
-          serie = jsyaml.load(yamlText);
-          if (!serie || !serie.exercices) {
-            alert("YAML invalide ou vide");
-            return;
-          }
-          document.getElementById("serieId").value = serie.id || "";
-          document.getElementById("serieTitre").value = serie.titre || "";
-          document.getElementById("serieMeta").style.display = "block";
-          var container = document.getElementById("exercices");
-          container.innerHTML = "";
-          cmInstances = [];
-          serie.exercices.forEach(function (ex, i) {
-            container.appendChild(renderExercice(ex, i));
-          });
-          document.getElementById("globalActions").style.display = "flex";
-          refreshAllCm();
-        }
 
         fetch(path)
           .then(function (r) { return r.text(); })
@@ -563,7 +576,7 @@
               window.SERIE_RAW = old;
               return;
             }
-            processSerieRaw();
+            loadFromSerieRaw(window.SERIE_RAW);
             window.SERIE_RAW = old;
           })
           .catch(function (e) {
@@ -572,7 +585,7 @@
               var s = document.createElement("script");
               s.src = path;
               s.onload = function () {
-                processSerieRaw();
+                loadFromSerieRaw(window.SERIE_RAW);
                 window.SERIE_RAW = old;
               };
               s.onerror = function () {
@@ -629,6 +642,33 @@
           a.click();
           URL.revokeObjectURL(a.href);
         }
+      });
+
+      document.getElementById("btnLoadLocal").addEventListener("click", function () {
+        document.getElementById("fileInput").click();
+      });
+
+      document.getElementById("fileInput").addEventListener("change", function (e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (event) {
+          var old = window.SERIE_RAW;
+          try {
+            eval(event.target.result);
+          } catch (err) {
+            alert("Erreur lors de l'évaluation du fichier : " + err.message);
+            window.SERIE_RAW = old;
+            return;
+          }
+          loadFromSerieRaw(window.SERIE_RAW);
+          window.SERIE_RAW = old;
+          e.target.value = "";
+        };
+        reader.onerror = function () {
+          alert("Impossible de lire le fichier.");
+        };
+        reader.readAsText(file);
       });
     })();
   </script>
