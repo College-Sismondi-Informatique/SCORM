@@ -119,9 +119,16 @@
     }
   }
 
+  function localSrc(file) {
+    if (typeof window !== "undefined" && window.LOCAL_OVERRIDE && window.LOCAL_OVERRIDE[file]) {
+      return window.LOCAL_OVERRIDE[file];
+    }
+    return base + file;
+  }
+
   function chainScripts(list, prefix, i, finish, onFirstFail) {
     if (i >= list.length) { finish(); return; }
-    var src = prefix + list[i];
+    var src = localSrc(list[i]);
     loadScript(src, function () { chainScripts(list, prefix, i + 1, finish, onFirstFail); }, function () {
       if (i === 0 && onFirstFail) onFirstFail();
       else fail(src);
@@ -208,7 +215,8 @@
   function run() {
     applyOutputExtension();
     function afterData() {
-      loadScript(base + APP, function () {}, function () { fail(base + APP); });
+      var appSrc = localSrc(APP);
+      loadScript(appSrc, function () {}, function () { fail(appSrc); });
     }
     if (isPreview) {
       window.addEventListener("message", function handler(e) {

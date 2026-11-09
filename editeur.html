@@ -121,6 +121,7 @@
           for (const l of ex.id.split("\n")) lines.push("        " + l);
           lines.push("      titre:");
           for (const l of ex.titre.split("\n")) lines.push("        " + l);
+          lines.push("      type: " + (ex.type || "python_turtle"));
           lines.push("      note: " + (ex.note ? "true" : "false"));
           lines.push("      figure: " + (ex.figure ? "true" : "false"));
           lines.push("      enonce:");
@@ -169,6 +170,10 @@
             }
           } else {
             lines.push("      checks: []");
+          }
+          if (ex.answers && ex.answers.trim()) {
+            lines.push("      answers:");
+            for (const l of ex.answers.split("\n")) lines.push("        " + l);
           }
         }
         return lines;
@@ -293,6 +298,22 @@
         inpTitre.dataset.field = "titre";
         lblTitre.appendChild(inpTitre);
 
+        const lblType = el("label", { textContent: "Type" });
+        const selType = el("select");
+        selType.dataset.field = "type";
+        [
+          { v: "theorie", t: "Théorie" },
+          { v: "python_turtle", t: "Python turtle" },
+          { v: "python_console", t: "Python console" },
+          { v: "qcm", t: "QCM" },
+          { v: "trous", t: "Texte à trous" }
+        ].forEach(function (opt) {
+          const o = el("option", { value: opt.v, textContent: opt.t });
+          if ((ex.type || "python_turtle") === opt.v) o.selected = true;
+          selType.appendChild(o);
+        });
+        lblType.appendChild(selType);
+
         const lblNote = el("label", { textContent: "Note ?", style: "display:flex;align-items:center;gap:6px" });
         const cbNote = el("input", { type: "checkbox" });
         cbNote.checked = !!ex.note;
@@ -307,9 +328,30 @@
 
         row1.appendChild(lblId);
         row1.appendChild(lblTitre);
+        row1.appendChild(lblType);
         row1.appendChild(lblNote);
         row1.appendChild(lblFigure);
         div.appendChild(row1);
+
+        // ----- Aide contextuelle selon le type -----
+        const typeHelp = el("div", {
+          className: "type-help",
+          style: "margin:8px 0 12px;padding:8px 12px;background:#f1f5f9;border-radius:6px;font-size:0.85rem;color:#475569;"
+        });
+        function updateTypeHelp() {
+          var t = selType.value;
+          var msgs = {
+            theorie: "Contenu informatif. L'éditeur Python reste visible si un code de démo est présent. Aucune vérification automatique.",
+            python_turtle: "Exercice Python avec tortue. Utilisez des checks de type source, shape, output, etc.",
+            python_console: "Exercice Python en mode texte (print). Pas de dessin tortue. Utilisez des checks source et output.",
+            qcm: "QCM HTML. Dans l'énoncé, mettez value=\"correct\" sur les <input type=\"checkbox\"|\"radio\"> qui sont les bonnes réponses. L'élève valide avec le bouton Vérifier.",
+            trous: "Texte à trous HTML. Dans l'énoncé, ajoutez data-answer=\"réponse\" sur chaque <input type=\"text\">. L'élève valide avec le bouton Vérifier."
+          };
+          typeHelp.textContent = msgs[t] || "";
+        }
+        selType.addEventListener("change", updateTypeHelp);
+        updateTypeHelp();
+        div.appendChild(typeHelp);
 
         // ----- Enoncé : Source (textarea) + Preview -----
         const enonceWrap = el('div');
@@ -350,6 +392,19 @@
         enonceWrap.appendChild(taEnonce);
         enonceWrap.appendChild(previewBox);
         div.appendChild(enonceWrap);
+
+        // ----- Réponses attendues (QCM / texte à trous) -----
+        const lblAnswers = el("label", {
+          textContent: "Réponses attendues (JSON) — optionnel si vous utilisez value=\"correct\" ou data-answer dans le HTML"
+        });
+        const taAnswers = el("textarea", {
+          value: ex.answers || "",
+          style: "min-height:60px;font-family:monospace;font-size:0.85rem;",
+          placeholder: '{"checkboxes":[2],"radios":{"q1":1}}  ou  {"trous":{"id1":"réponse"}}'
+        });
+        taAnswers.dataset.field = "answers";
+        div.appendChild(lblAnswers);
+        div.appendChild(taAnswers);
 
         // ----- Code initial avec CodeMirror -----
         const lblCode = el("label", { textContent: "Code initial (Python)" });
@@ -432,6 +487,7 @@
           const newEx = {
             id: "exN",
             titre: "Nouvel exercice",
+            type: "python_turtle",
             note: true,
             figure: false,
             enonce: "",

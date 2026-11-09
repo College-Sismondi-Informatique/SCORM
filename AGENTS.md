@@ -90,12 +90,46 @@ exercices:
 |-------|------|-------------|
 | `id` | string | Identifiant unique (ex: `"ex1"`, `"exemple"`) |
 | `titre` | string | Titre affiché dans l'onglet |
+| `type` | string | Catégorie de l'activité (`theorie`, `python_turtle`, `python_console`, `qcm`, `trous`) |
 | `note` | boolean | `true` si l'exercice est noté (affiche le bouton Vérifier) |
 | `figure` | boolean | `true` si une figure turtle doit être affichée (laisser `false` pour les séries print) |
 | `enonce` | string | Markdown/HTML de l'énoncé |
 | `code` | string | Code Python initial affiché dans l'éditeur |
 | `solutions` | string[] | Liste des solutions de référence |
 | `checks` | object[] | Critères de vérification (voir ci-dessous) |
+
+#### Types d'activité (`type`)
+
+- **`theorie`** — Contenu informatif : énoncé, vidéo, rappels. L'éditeur reste visible si un `code` de démo est présent, mais il n'y a pas de vérification automatique.
+- **`python_turtle`** — Exercice Python avec tortue : éditeur, console, dessin et critères de vérification.
+- **`python_console`** — Exercice Python en mode texte (`print`) : éditeur, console et critères, sans dessin.
+- **`qcm`** — Questionnaire à choix multiples en HTML (utiliser des `<input type="checkbox"/radio">` dans l'énoncé). L'éditeur et la console sont cachés. L' élève valide ses réponses avec le bouton **Vérifier**.
+- **`trous`** — Texte à trous en HTML (utiliser des `<input type="text">` dans l'énoncé). L'éditeur et la console sont cachés. L'élève valide avec le bouton **Vérifier**.
+
+#### Configuration du corrigé (QCM et texte à trous)
+
+Pour que la vérification fonctionne, le corrigé doit être indiqué dans l'HTML de l'énoncé :
+
+**QCM** — Marquez les bonnes réponses avec `value="correct"` :
+```html
+<form>
+  <label><input type="checkbox"> une mauvaise réponse</label><br>
+  <label><input type="checkbox" value="correct"> la bonne réponse</label><br>
+  <label><input type="radio" name="q1" value="correct"> la bonne réponse</label><br>
+  <label><input type="radio" name="q1"> une mauvaise réponse</label>
+</form>
+```
+
+**Texte à trous** — Ajoutez `data-answer="..."` sur chaque input :
+```html
+<p>La capitale de la France est <input type="text" data-answer="Paris">.</p>
+```
+
+Alternativement, vous pouvez remplir le champ **Réponses attendues (JSON)** dans l'éditeur :
+```json
+{"id_du_input": "réponse", "1": "autre réponse"}
+```
+L'ID de l'input ou son index (commençant à 0) sert de clé.
 
 ### Types de `checks`
 

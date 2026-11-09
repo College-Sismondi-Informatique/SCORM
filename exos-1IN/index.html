@@ -7,6 +7,10 @@
   <script>
     //var COMMUN = "https://scormcdg.github.io/python/script/v1/"; // commenter pour passer de skulpt à pyodide
     var COMMUN = "https://scormcdg.github.io/python/script/pyodide/v1/"; // commenter pour passer de pyodide à skulpt
+    window.LOCAL_OVERRIDE = {
+      "js/app.js": "js/app.js",
+      "js/checker.js": "js/checker.js"
+    };
   </script>
   <style>
     /* Mode sans tortue : la console prend la place du dessin */
@@ -17,6 +21,28 @@
     body.sans-tortue #btn-finir { display: none !important; }
     body.sans-tortue .zone-console { margin-top: 0; flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
     body.sans-tortue .console { flex: 1 1 auto; min-height: 260px; max-height: none; }
+
+    /* ---------- Types d'exercices ---------- */
+    /* Lecture seule : théorie, QCM, texte à troubles */
+    body.lecture-seule .editeur,
+    body.lecture-seule .zone-console,
+    body.lecture-seule .colonne-dessin { display: none !important; }
+    body.lecture-seule .actions { justify-content: flex-start; }
+    body.lecture-seule .espace { grid-template-columns: 1fr; }
+    body.lecture-seule .enonce { max-width: none; }
+
+    /* Onglets colorés par type */
+    .onglet.type-theorie { border-top: 3px solid #3b82f6; }
+    .onglet.type-python_turtle { border-top: 3px solid #2f7d4f; }
+    .onglet.type-python_console { border-top: 3px solid #f59e0b; }
+    .onglet.type-qcm { border-top: 3px solid #8b5cf6; }
+    .onglet.type-trous { border-top: 3px solid #ec4899; }
+
+    .onglet.type-theorie[aria-selected="true"] { background: #eff6ff; border-color: #3b82f6; }
+    .onglet.type-python_turtle[aria-selected="true"] { background: #e7f4ec; border-color: #2f7d4f; }
+    .onglet.type-python_console[aria-selected="true"] { background: #fffbeb; border-color: #f59e0b; }
+    .onglet.type-qcm[aria-selected="true"] { background: #f5f3ff; border-color: #8b5cf6; }
+    .onglet.type-trous[aria-selected="true"] { background: #fdf2f8; border-color: #ec4899; }
   </style>
   <script src="charger.js"></script>
   <script>
