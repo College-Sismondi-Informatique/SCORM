@@ -118,43 +118,60 @@
         lines.push("id: " + serieObj.id);
         lines.push("titre: " + serieObj.titre);
         lines.push("exercices:");
-        for (const ex of serieObj.exercices) {
+        for (const ex of serieObj.exercices || []) {
           lines.push("  -   id:");
-          for (const l of ex.id.split("\n")) lines.push("        " + l);
+          lines.push("        |-");
+          lines.push("          " + (ex.id || ""));
           lines.push("      titre:");
-          for (const l of ex.titre.split("\n")) lines.push("        " + l);
+          lines.push("        |-");
+          lines.push("          " + (ex.titre || ""));
           lines.push("      note: " + (ex.note ? "true" : "false"));
           lines.push("      figure: " + (ex.figure ? "true" : "false"));
           lines.push("      enonce:");
-          for (const l of ex.enonce.split("\n")) lines.push("        " + l);
+          lines.push("        |-");
+          (ex.enonce || "").split("\n").forEach(function (l) {
+            lines.push("          " + l);
+          });
           lines.push("      code:");
-          for (const l of ex.code.split("\n")) lines.push("        " + l);
+          lines.push("        |-");
+          (ex.code || "").split("\n").forEach(function (l) {
+            lines.push("          " + l);
+          });
           if (ex.solutions && ex.solutions.length) {
             lines.push("      solutions:");
             for (const sol of ex.solutions) {
               lines.push("        -       |");
-              for (const l of sol.split("\n")) lines.push("                    " + l);
+              (sol || "").split("\n").forEach(function (l) {
+                lines.push("                    " + l);
+              });
             }
           } else {
-            lines.push("      solutions: []");
+            lines.push("      solutions:");
           }
           if (ex.checks && ex.checks.length) {
             lines.push("      checks:");
             for (const ck of ex.checks) {
               lines.push("        -       id:");
-              for (const l of ck.id.split("\n")) lines.push("                    " + l);
+              lines.push("                    |-");
+              lines.push("                      " + (ck.id || ""));
               lines.push("                kind:");
-              for (const l of ck.kind.split("\n")) lines.push("                    " + l);
+              lines.push("                    |-");
+              lines.push("                      " + (ck.kind || ""));
               ["re", "name", "target", "label", "fail"].forEach(function (k) {
-                if (ck[k] !== undefined) {
+                if (ck[k] !== undefined && ck[k] !== "") {
                   lines.push("                " + k + ":");
-                  for (const l of String(ck[k]).split("\n")) lines.push("                    " + l);
+                  lines.push("                    |-");
+                  String(ck[k]).split("\n").forEach(function(l) {
+                    lines.push("                      " + l);
+                  });
                 }
               });
-              if (ck.opts) {
+              if (ck.opts && Object.keys(ck.opts).length > 0) {
                 lines.push("                opts:");
                 for (const ok in ck.opts) {
-                  lines.push("                  " + ok + ": " + (ck.opts[ok] ? "true" : "false"));
+                  if (ck.opts[ok]) {
+                    lines.push("                  " + ok + ": true");
+                  }
                 }
               }
               if (ck.hint) {
@@ -162,15 +179,21 @@
                 if (typeof ck.hint === "object") {
                   for (const hk in ck.hint) {
                     lines.push("                  " + hk + ":");
-                    for (const l of String(ck.hint[hk]).split("\n")) lines.push("                    " + l);
+                    lines.push("                    |-");
+                    String(ck.hint[hk]).split("\n").forEach(function(l) {
+                      lines.push("                      " + l);
+                    });
                   }
                 } else {
-                  for (const l of String(ck.hint).split("\n")) lines.push("                    " + l);
+                  lines.push("                    |-");
+                  String(ck.hint).split("\n").forEach(function(l) {
+                    lines.push("                      " + l);
+                  });
                 }
               }
             }
           } else {
-            lines.push("      checks: []");
+            lines.push("      checks:");
           }
         }
         return lines;
@@ -266,6 +289,23 @@
           optsBox.appendChild(lbl);
         });
         box.appendChild(optsBox);
+
+        // Hint fields
+        if (check.hint || check.kind === "shape") {
+          const hintBox = el("div");
+          hintBox.style.marginTop = "8px";
+          hintBox.innerHTML = "<b style=\"font-size:0.82rem\">Hint :</b>";
+          const hintFields = ["shape", "count", "size"];
+          hintFields.forEach(function (hk) {
+            const val = (check.hint && check.hint[hk]) || "";
+            const lbl = el("label", { textContent: hk, style: "font-size:0.82rem;display:block;margin-top:4px" });
+            const ta = el("textarea", { value: val, style: "min-height:40px;font-size:0.85rem;width:100%" });
+            ta.dataset.hint = hk;
+            lbl.appendChild(ta);
+            hintBox.appendChild(lbl);
+          });
+          box.appendChild(hintBox);
+        }
 
         const btnDel = el("button", { textContent: "🗑 Supprimer ce check", style: "margin-top:8px;background:#991b1b" });
         btnDel.onclick = function () { box.remove(); };
@@ -501,13 +541,27 @@
         div.querySelectorAll(".check-item").forEach(function (cbox) {
           const ck = {};
           cbox.querySelectorAll("[data-field]").forEach(function (inp) {
-            ck[inp.dataset.field] = inp.value;
+            const val = inp.value;
+            if (val !== "") {
+              ck[inp.dataset.field] = val;
+            }
           });
           const opts = {};
           cbox.querySelectorAll("[data-opt]").forEach(function (cb) {
-            opts[cb.dataset.opt] = cb.checked;
+            if (cb.checked) opts[cb.dataset.opt] = true;
           });
-          ck.opts = opts;
+          if (Object.keys(opts).length > 0) {
+            ck.opts = opts;
+          }
+          // hint
+          const hintObj = {};
+          cbox.querySelectorAll("[data-hint]").forEach(function (ta) {
+            const val = ta.value.trim();
+            if (val) hintObj[ta.dataset.hint] = val;
+          });
+          if (Object.keys(hintObj).length > 0) {
+            ck.hint = hintObj;
+          }
           checks.push(ck);
         });
         ex.checks = checks;
