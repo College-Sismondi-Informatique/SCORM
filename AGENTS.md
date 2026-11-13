@@ -64,9 +64,36 @@ window.SERIE_RAW = [
 
 Chaque ligne YAML est stockée comme une chaîne JSON (avec `JSON.stringify()`) pour éviter tout problème d'échappement.
 
-### YAML interne — règles d'indentation cruciales
+## Format canonique des `data/serieXX.js`
 
-La structure YAML utilise des listes (`- item`) avec des mappings indentés. La première clé de chaque item fixe l'indentation attendue pour toutes les clés suivantes de l'item.
+### Structure du fichier `.js`
+
+Chaque série est un **tableau JavaScript de chaînes**, joint par `.join("\n")` :
+
+```javascript
+window.SERIE_RAW = [
+  "id: serie01a",
+  "titre: Série 01a – Premier programme (turtle)",
+  "exercices:",
+  "  -   id:",
+  "        |-",
+  "          ex0",
+  "      titre:",
+  "        |-",
+  "          Exercice 0",
+  ...
+].join("\n");
+```
+
+**Règles absolues :**
+1. **Encodage UTF-8** : tous les caractères (émojis `❔`, flèches `⇧`, cubettes `🟥`, accents, etc.) doivent être codés en **UTF-8 pur**, jamais sous forme d'échappements `\uXXXX` ou de surrogates JavaScript (`\uD83D\uDFE5`). Le tableau JS contient les caractères Unicode littéraux.
+2. **Bloc YAML multi-ligne `|-`** : tous les champs texte (`enonce`, `code`, `solutions`, `label`, `fail`, `re`, etc.) utilisent le style multi-ligne YAML avec `|-` (et non `|` seul ni `"chaîne\n"`). Cela évite les problèmes d'échappement des retours à la ligne et des guillemets.
+3. **Backticks interdits** dans le contenu final du fichier `.js` car ils cassent le template literal JS. Si le contenu contient un backtick, il doit être stocké dans le YAML sous `|-` et le fichier `.js` global ne doit pas contenir de backticks non échappés.
+4. **IDs uniques** : chaque exercice dans une série doit avoir un `id:` unique. Des IDs dupliqués (ex: "dessin" répété 12 fois) cassent la navigation dans l'éditeur et le SCORM. Agent : si tu détectes des doublons, suffixe-les (`dessin_2`, `dessin_3`, …).
+
+### Indentation YAML — règle d'or (inchangée)
+
+La structure utilise des listes (`- item`) avec des mappings indentés. La première clé de chaque item fixe l'indentation attendue pour toutes les clés suivantes de l'item.
 
 ```yaml
 exercices:

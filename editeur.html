@@ -140,7 +140,7 @@
           if (ex.solutions && ex.solutions.length) {
             lines.push("      solutions:");
             for (const sol of ex.solutions) {
-              lines.push("        -       |");
+              lines.push("        -       |-");
               (sol || "").split("\n").forEach(function (l) {
                 lines.push("                    " + l);
               });
