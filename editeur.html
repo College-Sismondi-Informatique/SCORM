@@ -110,7 +110,11 @@
       }
 
       function escapeJsString(str) {
-        return JSON.stringify(str);
+        // Utilise JSON.stringify pour échapper quotes/backslashes/nuls,
+        // puis remplace les \uXXXX par les caractères UTF-8 réels.
+        return JSON.stringify(str).replace(/\\u([0-9a-fA-F]{4})/g, function (m, hex) {
+          return String.fromCharCode(parseInt(hex, 16));
+        });
       }
 
       function buildYaml(serieObj) {
@@ -511,6 +515,8 @@
       function gatherSingle(div) {
         const ex = {};
         div.querySelectorAll("[data-field]").forEach(function (inp) {
+          // Ignorer les champs des checks (ils ont leur propre collecte)
+          if (inp.closest(".check-item")) return;
           const k = inp.dataset.field;
           if (k === "note" || k === "figure") {
             ex[k] = inp.checked;
