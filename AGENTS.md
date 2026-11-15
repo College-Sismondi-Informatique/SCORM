@@ -39,13 +39,18 @@ Dans `imsmanifest.xml`, chaque ressource peut redéfinir le chemin des données 
 - **URL absolue** (`data_url=https://monsite.com/data/serieXX.js`) : les données sont chargées depuis un serveur externe. Le package SCORM n'a même pas besoin de les contenir.
 
 ### `index.html`
-- Modifier `<title>` si besoin
-- Le reste est identique au modèle
+- Modifier `<title>` si besoin.
+- **Auto-détection de la source `COMMUN`** (assets SCORMcdg) :
+  - `file://` (ouverture directe du HTML) → utilise `../../SCORMcdg-python/script/pyodide/v1/` (dossiers parallèles).
+  - `?local=1` (avec un serveur local) → teste `HEAD` sur le dossier voisin `../SCORMcdg-python/...` ; si trouvé, l'utilise, sinon bascule sur GitHub Pages.
+  - Production (`localhost` normal ou HTTPS) → `https://scormcdg.github.io/python/script/pyodide/v1/`.
+- **SCORMcdg-javascript** n'est **pas** utilisé pour les séries Python : toutes les dépendances (`app.js`, `engine.js`, `turtle.js`, `checker.js`, `scorm.js`, CodeMirror, etc.) sont servies depuis `SCORMcdg-python`.
+- Il ne doit plus y avoir de surcharge CSS locale pour `.CodeMirror` (le style adaptatif `height: auto` est dans le CSS SCORMcdg).
 
 ### `charger.js`
 - Copier tel quel depuis n'importe quelle série existante.
-- Il lit `data_url` depuis l'URL (`?data_url=...`), sinon charge depuis GitHub Pages.
-- Charge ensuite les dépendances depuis `COMMUN` (GitHub) puis les données d'exercices.
+- Il lit `data_url` depuis l'URL (`?data_url=...`), sinon charge depuis le `COMMUN` détecté.
+- Charge ensuite les dépendances (CSS + JS) depuis `COMMUN` puis les données d'exercices (fichier `data/` ou `data_url=`).
 
 ---
 
@@ -89,6 +94,7 @@ window.SERIE_RAW = [
 1. **Encodage UTF-8** : tous les caractères (émojis `❔`, flèches `⇧`, cubettes `🟥`, accents, etc.) doivent être codés en **UTF-8 pur**, jamais sous forme d'échappements `\uXXXX` ou de surrogates JavaScript (`\uD83D\uDFE5`). Le tableau JS contient les caractères Unicode littéraux.
 2. **Bloc YAML multi-ligne `|-`** : tous les champs texte (`enonce`, `code`, `solutions`, `label`, `fail`, `re`, etc.) utilisent le style multi-ligne YAML avec `|-` (et non `|` seul ni `"chaîne\n"`). Cela évite les problèmes d'échappement des retours à la ligne et des guillemets.
 3. **Backticks interdits** dans le contenu final du fichier `.js` car ils cassent le template literal JS. Si le contenu contient un backtick, il doit être stocké dans le YAML sous `|-` et le fichier `.js` global ne doit pas contenir de backticks non échappés.
+   - **Attention** : ne pas non plus laisser de séquences `\`` (backslash + backtick) provenant d'anciennes versions ou de conversions Markdown mal nettoyées. Remplacer systématiquement `\`` par `` ` `` pur dans le contenu YAML.
 4. **IDs uniques** : chaque exercice dans une série doit avoir un `id:` unique. Des IDs dupliqués (ex: "dessin" répété 12 fois) cassent la navigation dans l'éditeur et le SCORM. Agent : si tu détectes des doublons, suffixe-les (`dessin_2`, `dessin_3`, …).
 
 ### Indentation YAML — règle d'or (inchangée)
@@ -181,6 +187,10 @@ Un éditeur web permet de modifier les séries sans toucher au YAML directement 
 - **Coloration syntaxique** : CodeMirror pour le code Python ; Prism.js pour le preview Markdown
 - **Toolbar Markdown** : boutons pour insérer facilement bold, italic, titres, listes, blocs code, liens, images
 - Enregistrer avec le bouton 💾 (propose la boîte de dialogue native via `showSaveFilePicker` si disponible)
+
+### Points d'attention pour l'éditeur
+1. **Format de sortie UTF-8** : la fonction `escapeJsString` doit utiliser `JSON.stringify()` puis remplacer les séquences `\uXXXX` par les caractères Unicode réels. Cela évite des diffs énormes dûs aux échappements JSON sur les accents et émojis.
+2. **IDs des exercices vs IDs des checks** : la collecte des données (`gatherSingle`) doit filtrer les champs `[data-field]` situés à l'intérieur des `.check-item`, sinon l'`id` du premier check écrase l'`id` de l'exercice.
 
 ### Ajouter/modifier des exercices
 - Chaque bloc d'exercice a deux boutons : **➕ Insérer un exercice après** et **🗑 Supprimer cet exercice**
